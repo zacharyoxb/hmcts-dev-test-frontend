@@ -7,17 +7,17 @@ enum TaskStatus {
   COMPLETED = "COMPLETED"
 }
 
-interface Task {
-  id: number;
+interface TaskRequestBody {
   title: string;
   status: TaskStatus;
   description?: string;
   dueDate: string;
 }
 
-interface TaskRequestBody {
+interface Task {
+  id: number;
   title: string;
-  status: TaskStatus;
+  status: string;
   description?: string;
   dueDate: string;
 }
@@ -45,10 +45,11 @@ export default function (app: Application): void {
 
       const response = await axios.post<Task>('http://localhost:4000/tasks/create-task', newTask);
 
+      // dynamic helper
       const getStatusClass = (status: string): string => {
         const statusClasses: { [key: string]: string } = {
-          'NOT_COMPLETED': 'govuk-tag--grey',
-          'IN_PROGRESS': 'govuk-tag--blue',
+          'NOT COMPLETED': 'govuk-tag--grey',
+          'IN PROGRESS': 'govuk-tag--blue',
           'COMPLETED': 'govuk-tag--green',
         };
         return statusClasses[status] || 'govuk-tag--grey';
@@ -75,9 +76,9 @@ export default function (app: Application): void {
       const task: Task = {
         id: response.data.id,
         title: response.data.title,
-        status: response.data.status,
+        status: formatStatus(response.data.status),
         description: response.data.description,
-        dueDate: response.data.dueDate
+        dueDate: formatDate(response.data.dueDate)
       };
 
       res.render('home', { 
