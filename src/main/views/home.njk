@@ -1,121 +1,172 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% extends "template.njk" %}
 
-<!-- You may want to make further use of these components: https://design-system.service.gov.uk/components/
-but ultimately it is up to you -->
-
 {% block content %}
-  <h1 class="govuk-heading-xl">Welcome to your dev test!</h1>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Task Manager</h1>
 
-  <!-- The freedom is yours. You can design the solution however you like, however there is a starting point provided
-  to ensure you have both services running. You may want to make use of the Gov UK Components:
-  https://design-system.service.gov.uk/components/ to add tabs and so forth :) -->
+      {% if not task %}
+        <!-- Input form, only displayed before POST is sent -->
+        
+        <form method="POST" action="/create-task">
+          <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                <h2 class="govuk-fieldset__heading">
+                  Create New Task
+                </h2>
+              </legend>
 
-  {% if example.id %}
+              <!-- Title Input -->
+              {{ govukInput({
+                label: {
+                  text: "Task title"
+                },
+                id: "title",
+                name: "title",
+                classes: "govuk-!-width-two-thirds"
+              }) }}
 
-    {{ govukSummaryList({
-      rows: [
-        {
-          key: {
-            text: "ID"
-          },
-          value: {
-            text: example.id
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change",
-                visuallyHiddenText: "change case id ?!"
+              <!-- Status Dropdown -->
+              {{ govukSelect({
+                id: "status",
+                name: "status",
+                label: {
+                  text: "Status"
+                },
+                items: [
+                  {
+                    value: "NOT_COMPLETED",
+                    text: "Not Completed",
+                    selected: true
+                  },
+                  {
+                    value: "IN_PROGRESS",
+                    text: "In Progress"
+                  },
+                  {
+                    value: "COMPLETED",
+                    text: "Completed"
+                  }
+                ],
+                classes: "govuk-!-width-one-third"
+              }) }}
+
+              <!-- Description Textarea -->
+              {{ govukTextarea({
+                name: "description",
+                id: "description",
+                label: {
+                  text: "Description"
+                },
+                hint: {
+                  text: "Provide details about what this task involves"
+                },
+                rows: 4,
+                classes: "govuk-!-width-two-thirds"
+              }) }}
+
+              <!-- Due Date Input -->
+              {{ govukDateInput({
+                id: "dueDate",
+                namePrefix: "dueDate",
+                fieldset: {
+                  legend: {
+                    text: "Due date",
+                    isPageHeading: false,
+                    classes: "govuk-fieldset__legend--s"
+                  }
+                },
+                hint: {
+                  text: "For example, 27 3 2024"
+                },
+                items: [
+                  {
+                    name: "day",
+                    classes: "govuk-input--width-2"
+                  },
+                  {
+                    name: "month", 
+                    classes: "govuk-input--width-2"
+                  },
+                  {
+                    name: "year",
+                    classes: "govuk-input--width-4"
+                  }
+                ]
+              }) }}
+
+              <!-- Submit Button -->
+              <div class="govuk-button-group">
+                {{ govukButton({
+                  text: "Create task",
+                  preventDoubleClick: true
+                }) }}
+              </div>
+
+            </fieldset>
+          </div>
+        </form>
+
+      {% else %}
+        <!-- Show task details when task exists -->
+        <h2 class="govuk-heading-l">Your Task</h2>
+        
+        {{ govukSummaryList({
+          rows: [
+            {
+              key: {
+                text: "Task ID"
+              },
+              value: {
+                text: task.id
               }
-            ]
-          }
-        },
-        {
-          key: {
-            text: "Case Number"
-          },
-          value: {
-            text: example.caseNumber
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change",
-                visuallyHiddenText: "change case number"
+            },
+            {
+              key: {
+                text: "Title"
+              },
+              value: {
+                text: task.title
               }
-            ]
-          }
-        },
-        {
-          key: {
-            text: "Title"
-          },
-          value: {
-            html: example.title
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change",
-                visuallyHiddenText: "change case title"
+            },
+            {
+              key: {
+                text: "Status"
+              },
+              value: {
+                html: govukTag({
+                  text: formatStatus(task.status),
+                  classes: getStatusClass(task.status)
+                })
               }
-            ]
-          }
-        },
-        {
-          key: {
-            text: "Description"
-          },
-          value: {
-            html: example.description
-          },
-          actions: {
-            items: [
-               {
-                 href: "#",
-                 text: "Delete",
-                 visuallyHiddenText: "Delete description"
-               },
-               {
-                 href: "#",
-                 text: "Change",
-                 visuallyHiddenText: "Change description"
-               }
-            ]
-          }
-        },
-        {
-          key: {
-            text: "Status"
-          },
-          value: {
-            html: example.status
-          },
-          actions: {
-            items: [
-            ]
-          }
-        },
-        {
-          key: {
-           text: "Created Date"
-          },
-          value: {
-           html: example.createdDate
-          },
-          actions: {
-           items: [
-           ]
-          }
-        }
-      ]
-    }) }}
-
-  {% endif %}
-
+            },
+            {
+              key: {
+                text: "Description"
+              },
+              value: {
+                html: task.description or "N/A"
+              }
+            },
+            {
+              key: {
+                text: "Due Date"
+              },
+              value: {
+                html: formatDate(task.dueDate)
+              }
+            }
+          ]
+        }) }}
+      {% endif %}
+    </div>
+  </div>
 {% endblock %}
