@@ -8,4 +8,5 @@ To begin with, you should be able to run this by running:
 2) `yarn webpack`
 3) `yarn start:dev` or navigate to package.json and run the script manually
 
-You can change the structure however you like! 
+CANDIDATE NOTES: 
+No changes needed for this one, I just made changes to the home njk and typescript files.
