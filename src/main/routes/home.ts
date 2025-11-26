@@ -29,11 +29,18 @@ export default function (app: Application): void {
 
   app.post('/create-task', async (req: Request, res: Response) => {
     try {
+      // standard gov date template gives date as day/month/year - format
+      const day = req.body['dueDate-day'];
+      const month = req.body['dueDate-month'];
+      const year = req.body['dueDate-year'];
+
+      const dueDate = new Date(`${year}-${month}-${day}`).toISOString();
+
       const newTask: TaskRequestBody = {
-        title: req.body.title || "New Task", 
-        status: TaskStatus.IN_PROGRESS,
+        title: req.body.title, 
+        status: req.body.status as TaskStatus,
         description: req.body.description,
-        dueDate: req.body.dueDate || new Date().toISOString()
+        dueDate: dueDate
       };
 
       const response = await axios.post<Task>('http://localhost:4000/tasks/create-task', newTask);
